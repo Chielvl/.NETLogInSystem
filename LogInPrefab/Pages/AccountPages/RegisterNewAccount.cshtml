@@ -1,0 +1,126 @@
+﻿@page
+@model LogInPrefab.Pages.RegisterNewAccountModel
+@{
+    ViewData["Title"] = "Register or log in";
+    string accountName = Model.Account == null? String.Empty: Model.Account.AccountName;
+    string firstName = Model.Account == null ? String.Empty : Model.Account.FirstName;
+    string lastName = Model.Account == null ? String.Empty : Model.Account.LastName;
+    string email = Model.Account == null ? String.Empty : Model.Account.Email;
+    string error = string.IsNullOrEmpty(Model.errorMessage) ? String.Empty : Model.errorMessage;
+}
+<div class="row">
+    <div class="col-6 ">
+        <div class="card" id="card">
+            <div class="card-header">
+                <h2>Register new user</h2>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Email Address</label>
+                        <input asp-for="Account.Email" id="email" name="email" type="email" class="form-control"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">User name</label>
+                        <input asp-for="Account.AccountName" id="accountName" value="@accountName" name="accountName" type="text" class="form-control"/>
+                    </div>
+                    <div id="error" class="alert-danger">@error</div>
+
+
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input id="password" name="password" type="password" class="form-control"/>
+                    </div>
+                    <div id="passwordError" class="alert-danger"></div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Confirm Password</label>
+                        <input id="confirmPassword" name="confirmPassword" type="password" class="form-control"/>
+                    </div>
+                    <div id="confirmPasswordError" class="alert-danger"></div>
+
+                    <hr/>
+                    <div class="mb-3">
+                        <label class="form-label">First name</label>
+                        <input asp-for="Account.FirstName" id="firstName" name="firstName" type="text" class="form-control"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Last name</label>
+                        <input asp-for="Account.LastName" id="lastName" name="lastName" type="text" class="form-control"/>
+                    </div>
+
+
+
+                    <button disabled="disabled" id="registerButton" type="submit" class="btn btn-primary mt-5">Register</button>
+
+                </form>
+            </div>
+            <div class="card-footer"></div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var passwordField = document.getElementById("password");
+    var confirmPasswordField = document.getElementById("confirmPassword");
+    
+    passwordField.addEventListener('blur',VerifyOriginalpassword);
+    confirmPasswordField.addEventListener('blur',VerifyPasswords);
+
+    function VerifyOriginalpassword() {
+        if (passwordField.value.length < 8){
+            GiveExtraInformationInvalidpassword();
+        } else {
+            document.getElementById("passwordError").innerText = "";
+        }
+
+    }
+
+    function GiveExtraInformationInvalidpassword() {
+
+        passwordField.classList.add("inputFieldInvalid");
+        var errorMsg = "Error: <ul>";
+        if (passwordField.value.length < 8) {
+            errorMsg += "<li>password needs to be at least 8 characters</li>";
+        }
+        
+        if(document.getElementById("accountName").value.length > 0
+            && passwordField.value.includes(document.getElementById("accountName").value)) {
+            
+            errorMsg += "<li>password can not contain your username</li>";
+        }
+        if(document.getElementById("firstName").value.length > 0
+            && passwordField.value.includes(document.getElementById("firstName").value)) {
+            
+            errorMsg +=  "<li>password can not contain your firstname</li>";
+        }
+        
+        document.getElementById("passwordError").innerHTML = errorMsg + "</ul>";
+
+    }
+
+    function VerifyPasswords() {
+        if (passwordField.value != confirmPasswordField.value) {
+            document.getElementById("confirmPasswordError").innerText ="passwords mismatch";
+            confirmPasswordField.classList.add("inputFieldInvalid");
+        } else {
+            if (passwordField.value.length > 0) {
+                document.getElementById("registerButton").disabled = false;
+                
+            }
+            document.getElementById("confirmPasswordError").innerText = "";
+
+        }
+    }
+    
+    function CreateHelpDiv(parent, message) {
+        parent = parent.parentElement;
+        var div = document.createElement("div");
+        div.classList.add("invalidpasswordExtraInformationDiv");
+        div.innerHTML = message;
+        parent.appendChild(div);
+    }
+</script>
